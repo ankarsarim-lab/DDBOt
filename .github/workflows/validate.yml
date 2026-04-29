@@ -1,0 +1,51 @@
+name: Validate
+
+on:
+  pull_request:
+    branches:
+      - master
+
+concurrency:
+  group: validate-${{ github.head_ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20.x
+          cache: 'npm'
+
+      - name: Get cached dependencies
+        id: cache-npm
+        uses: actions/cache/restore@d4323d4df104b026a6aa633fdb11d772146be0bf
+        with:
+          path: node_modules
+          key: npm-${{ hashFiles('./package-lock.json') }}
+
+      - name: Install dependencies
+        if: ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
+        run: npm ci
+
+      - name: Save dependency cache
+        if: ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
+        uses: actions/cache/save@d4323d4df104b026a6aa633fdb11d772146be0bf
+        with:
+          path: node_modules
+          key: npm-${{ hashFiles('./package-lock.json') }}
+
+      - name: Lint
+        run: npm run test:lint
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
