@@ -15,7 +15,8 @@ export const APP_IDS = {
 export const livechat_license_id = 12049137;
 export const livechat_client_id = '66aa088aad5a414484c1fd1fa8a5ace7';
 
-export const domain_app_ids = {
+export const domain_app_ids: Record<string, string | number> = {
+    'ddbot-2kq.pages.dev': '3381cNhGpF6qZT11IAFpz',
     'master.bot-standalone.pages.dev': APP_IDS.TMP_STAGING,
     'staging-dbot.deriv.com': APP_IDS.STAGING,
     'staging-dbot.deriv.be': APP_IDS.STAGING_BE,
